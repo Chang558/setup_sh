@@ -1,6 +1,6 @@
 # Introduce
 
-이 저장소는 Jetson 환경에서 NoMachine, PyTorch, torchvision, YOLOv7 등을 설정하는 다양한 스크립트를 포함하고 있습니다.
+이 저장소는 Jetson 환경에서 NoMachine, PyTorch, torchvision, YOLOv7 등을 설정하는 다양한 스크립트를 포함하고 있음.
 
 ### NoMachine 설정
 
