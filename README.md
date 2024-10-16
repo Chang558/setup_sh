@@ -13,7 +13,7 @@ IP 설정이 완료되었다면, NoMachine 프로그램에서 원격 접속이 �
 이 스크립트는 Jetson 환경에서 기본적인 설정을 자동으로 수행함.
   XFCE4 터미널: 원격 접속용 가벼운 터미널 설치
   VSFTPD: FTP 서버 설치 및 설정
-  NVMe 마운트: NVMe 저장 장치를 자동 마운트
+  rootNVMe (git): NVMe 저장 장치를 자동 마운트
   Jetson Stats: 성능 모니터링 도구 설치
   JetPack 5.1.2: JetPack 5.1.2 설치
 
@@ -26,3 +26,7 @@ version :
 
 ### yolov7 setup && pytorch build.sh
 yolov7-tiny.pt을 TensorRT 엔진으로 변환하며, 이에 필요한 PyTorch와 Torchvision을 호환성에 맞춰 빌드
+
+### onnxruntime-gpu_build.sh
+Jetson에서는 onnxruntim-gpu가 없으므로 직접 빌드하여 사용하여야함.
+onnxruntime-gpu 빌드하기위한 스크립트임. 시간이 꽤 소모되므로 링크에서 다운받는것을 추천
