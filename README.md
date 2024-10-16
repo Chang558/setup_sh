@@ -11,11 +11,11 @@ IP 설정이 완료되었다면, NoMachine 프로그램에서 원격 접속이 �
 
 ### environment_setting.sh 
 이 스크립트는 Jetson 환경에서 기본적인 설정을 자동으로 수행함.
-  XFCE4 터미널: 원격 접속용 가벼운 터미널 설치
-  VSFTPD: FTP 서버 설치 및 설정
-  rootNVMe (git): NVMe 저장 장치를 자동 마운트
-  Jetson Stats: 성능 모니터링 도구 설치
-  JetPack 5.1.2: JetPack 5.1.2 설치
+  1. XFCE4 터미널: 원격 접속용 가벼운 터미널 설치 \n
+  2. VSFTPD: FTP 서버 설치 및 설정
+  3. rootNVMe (git): NVMe 저장 장치를 자동 마운트
+  4. Jetson Stats: 성능 모니터링 도구 설치
+  5. JetPack 5.1.2: JetPack 5.1.2 설치
 
 ### torchvision && pytorch build.sh
 Jetson 5.1.2버전과 호환되는 PyTorch와 Torchvision을 설치
