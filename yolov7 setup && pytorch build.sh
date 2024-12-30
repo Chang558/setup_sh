@@ -63,20 +63,6 @@ mkdir build
 cd build
 cp ../../yolov7-tiny.wts .
 sudo make && sudo cmake ..
-if [ $? -eq 0 ]; then
-  echo "cmake is command succeeded."
-else
-  echo "cmake is command failed. Install Stop"
-  exit 1
-fi
-
-make
-if [ $? -eq 0 ]; then
-  echo "make is command succeeded."
-else
-  echo "make is command failed. Install Stop"
-  exit 1
-fi
 
 
 # 스왑 파일 설정 (메모리 부족 시)
