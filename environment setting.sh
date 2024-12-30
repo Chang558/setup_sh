@@ -54,10 +54,10 @@ echo 'USERNAME=terry' >> /home/$USERNAME/install_nvidia_jetpack.sh
 echo 'echo "$(date): NVIDIA JetPack 설치 시작" >> /home/$USERNAME/install_log.txt' >> /home/$USERNAME/install_nvidia_jetpack.sh
 echo 'sudo apt install nvidia-jetpack -y >> /home/$USERNAME/install_log.txt 2>&1' >> /home/$USERNAME/install_nvidia_jetpack.sh
 echo 'echo "$(date): NVIDIA JetPack 설치 완료" >> /home/$USERNAME/install_log.txt' >> /home/$USERNAME/install_nvidia_jetpack.sh
-echo 'bash /home/$USERNAME/delete_files.sh &' >> /home/$USERNAME/install_nvidia_jetpack.sh
+echo 'rm -f ~/.config/autostart/nvidia_install.desktop' >> /home/$USERNAME/install_nvidia_jetpack.sh
 sudo chmod +x /home/$USERNAME/install_nvidia_jetpack.sh
 
-# .desktop 파일 생성하여 재부팅 후 자동 실행
+# .desktop 파일 생성하여 재부팅 후 한 번만 실행
 mkdir -p ~/.config/autostart
 cat <<EOF > ~/.config/autostart/nvidia_install.desktop
 [Desktop Entry]
@@ -72,14 +72,6 @@ EOF
 
 chmod +x ~/.config/autostart/nvidia_install.desktop
 
-# 파일 삭제 스크립트 생성
-echo '#!/bin/bash' > /home/$USERNAME/delete_files.sh
-echo 'sleep 120' >> /home/$USERNAME/delete_files.sh
-echo 'rm -f /home/$USERNAME/.config/autostart/nvidia_install.desktop' >> /home/$USERNAME/delete_files.sh
-echo 'rm -f /home/$USERNAME/install_nvidia_jetpack.sh' >> /home/$USERNAME/delete_files.sh
-echo 'rm -f /home/$USERNAME/delete_files.sh' >> /home/$USERNAME/delete_files.sh
-sudo chmod +x /home/$USERNAME/delete_files.sh
-
 # ~/.bashrc에 CUDA 경로 추가 (중복 확인 후 추가)
 if ! grep -q 'export PATH="/usr/local/cuda-11.4/bin:$PATH"' ~/.bashrc; then
     echo 'export PATH="/usr/local/cuda-11.4/bin:$PATH"' >> ~/.bashrc
@@ -90,23 +82,6 @@ if ! grep -q 'export LD_LIBRARY_PATH="/usr/local/cuda-11.4/lib64:$LD_LIBRARY_PAT
 fi
 
 source ~/.bashrc
-
-# Systemd 서비스 생성 (추가 옵션)
-cat <<EOF | sudo tee /etc/systemd/system/nvidia_install.service
-[Unit]
-Description=Install NVIDIA JetPack
-After=multi-user.target
-
-[Service]
-User=$USERNAME
-ExecStart=/home/$USERNAME/install_nvidia_jetpack.sh
-Restart=on-failure
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-sudo systemctl enable nvidia_install.service
 
 # 재부팅
 sudo reboot
