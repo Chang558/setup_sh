@@ -62,7 +62,7 @@ cd yolov7/
 mkdir build
 cd build
 cp ../../yolov7-tiny.wts .
-cmake ..
+sudo make && sudo cmake ..
 if [ $? -eq 0 ]; then
   echo "cmake is command succeeded."
 else
