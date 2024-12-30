@@ -51,22 +51,26 @@ fi
 # 설치 스크립트 생성
 echo '#!/bin/bash' > /home/$USERNAME/install_nvidia_jetpack.sh
 echo 'USERNAME=terry' >> /home/$USERNAME/install_nvidia_jetpack.sh
-echo 'notify-send "NVIDIA Setup" "JetPack 설치를 시작합니다."' >> /home/$USERNAME/install_nvidia_jetpack.sh
-echo 'sudo apt install nvidia-jetpack -y' >> /home/$USERNAME/install_nvidia_jetpack.sh
-echo 'notify-send "NVIDIA Setup" "작업이 완료되었습니다."' >> /home/$USERNAME/install_nvidia_jetpack.sh
+echo 'echo "$(date): NVIDIA JetPack 설치 시작" >> /home/$USERNAME/install_log.txt' >> /home/$USERNAME/install_nvidia_jetpack.sh
+echo 'sudo apt install nvidia-jetpack -y >> /home/$USERNAME/install_log.txt 2>&1' >> /home/$USERNAME/install_nvidia_jetpack.sh
+echo 'echo "$(date): NVIDIA JetPack 설치 완료" >> /home/$USERNAME/install_log.txt' >> /home/$USERNAME/install_nvidia_jetpack.sh
 echo 'bash /home/$USERNAME/delete_files.sh &' >> /home/$USERNAME/install_nvidia_jetpack.sh
 sudo chmod +x /home/$USERNAME/install_nvidia_jetpack.sh
 
 # .desktop 파일 생성하여 재부팅 후 자동 실행
 mkdir -p ~/.config/autostart
-echo "[Desktop Entry]" > ~/.config/autostart/nvidia_install.desktop
-echo "Type=Application" >> ~/.config/autostart/nvidia_install.desktop
-echo "Exec=gnome-terminal -- bash -c '/home/$USERNAME/install_nvidia_jetpack.sh; exec bash'" >> ~/.config/autostart/nvidia_install.desktop
-echo "Hidden=false" >> ~/.config/autostart/nvidia_install.desktop
-echo "NoDisplay=false" >> ~/.config/autostart/nvidia_install.desktop
-echo "X-GNOME-Autostart-enabled=true" >> ~/.config/autostart/nvidia_install.desktop
-echo "Name=NVIDIA Setup" >> ~/.config/autostart/nvidia_install.desktop
-echo "Comment=Install NVIDIA JetPack after reboot" >> ~/.config/autostart/nvidia_install.desktop
+cat <<EOF > ~/.config/autostart/nvidia_install.desktop
+[Desktop Entry]
+Type=Application
+Exec=gnome-terminal -- bash -c '/home/$USERNAME/install_nvidia_jetpack.sh; exec bash'
+Hidden=false
+NoDisplay=false
+X-GNOME-Autostart-enabled=true
+Name=NVIDIA Setup
+Comment=Install NVIDIA JetPack after reboot
+EOF
+
+chmod +x ~/.config/autostart/nvidia_install.desktop
 
 # 파일 삭제 스크립트 생성
 echo '#!/bin/bash' > /home/$USERNAME/delete_files.sh
@@ -87,6 +91,22 @@ fi
 
 source ~/.bashrc
 
+# Systemd 서비스 생성 (추가 옵션)
+cat <<EOF | sudo tee /etc/systemd/system/nvidia_install.service
+[Unit]
+Description=Install NVIDIA JetPack
+After=multi-user.target
+
+[Service]
+User=$USERNAME
+ExecStart=/home/$USERNAME/install_nvidia_jetpack.sh
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+sudo systemctl enable nvidia_install.service
+
 # 재부팅
 sudo reboot
-
