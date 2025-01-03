@@ -1,4 +1,5 @@
 #!/bin/bash
+sudo apt-get -y install ifupdown
 
 wget https://download.nomachine.com/download/8.13/Arm/nomachine_8.13.1_1_aarch64.tar.gz -O nomachine.tar.gz
 
