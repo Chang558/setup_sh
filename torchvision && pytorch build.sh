@@ -35,7 +35,7 @@ cd ../
 echo "export PATH=/usr/local/cuda-11.4/bin${PATH:+:${PATH}}" >> ~/.bashrc
 echo "export LD_LIBRARY_PATH=/usr/local/cuda-11.4/lib64:$LD_LIBRARY_PATH" >>~/.bashrc
 source ~/.bashrc
-sudo python3 -m pip install pycuda
+python3 -m pip install pycuda
 sudo cp -r /home/terry/.local/lib/python3.8/site-packages/pycuda* /usr/lib/python3.8/dist-packages
 
 if nvcc --version > /dev/null 2>&1; then
