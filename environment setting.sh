@@ -22,6 +22,16 @@ sudo apt-get install python3-pip -y
 sudo apt-get install nodejs -y
 sudo apt-get install npm -y
 
+# 한글 환경 설정
+sudo apt-get install -y language-pack-ko fonts-nanum fonts-nanum-coding ibus ibus-hangul
+sudo update-locale LANG=ko_KR.UTF-8
+echo "GTK_IM_MODULE=ibus" | sudo tee -a /etc/environment
+echo "QT_IM_MODULE=ibus" | sudo tee -a /etc/environment
+echo "XMODIFIERS=@im=ibus" | sudo tee -a /etc/environment
+ibus-setup
+
+source ~/.bashrc
+
 # xrdp 설정 수정
 LINE_NUM=$(wc -l < /etc/xrdp/startwm.sh)
 sudo sed -i "$((LINE_NUM-1))s/^/#/" /etc/xrdp/startwm.sh
