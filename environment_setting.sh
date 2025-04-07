@@ -9,7 +9,14 @@ if ! sudo grep -q "$USERNAME ALL=NOPASSWD: ALL" /etc/sudoers; then
     echo "$USERNAME ALL=NOPASSWD: ALL" | sudo tee -a /etc/sudoers
 fi
 
-# 자동 로그인 설정 (GNOME 환경용)
+# 자동 로그인 설정 (gdm3용)
+sudo sed -i 's/^#*AutomaticLoginEnable.*/AutomaticLoginEnable=true/' /etc/gdm3/custom.conf
+sudo sed -i "s/^#*AutomaticLogin.*/AutomaticLogin=$USERNAME/" /etc/gdm3/custom.conf
+sudo sed -i 's/^#*TimedLoginEnable.*/TimedLoginEnable=true/' /etc/gdm3/custom.conf || echo "TimedLoginEnable=true" | sudo tee -a /etc/gdm3/custom.conf
+sudo sed -i "s/^#*TimedLogin.*/TimedLogin=$USERNAME/" /etc/gdm3/custom.conf || echo "TimedLogin=$USERNAME" | sudo tee -a /etc/gdm3/custom.conf
+sudo sed -i 's/^#*TimedLoginDelay.*/TimedLoginDelay=0/' /etc/gdm3/custom.conf || echo "TimedLoginDelay=0" | sudo tee -a /etc/gdm3/custom.conf
+
+# AccountsService 사용자 설정
 sudo mkdir -p /var/lib/AccountsService/users
 sudo bash -c "cat <<EOF > /var/lib/AccountsService/users/$USERNAME
 [User]
@@ -18,6 +25,9 @@ XSession=gnome
 SystemAccount=false
 AutomaticLogin=true
 EOF"
+
+sudo chown root:root /var/lib/AccountsService/users/$USERNAME
+sudo chmod 644 /var/lib/AccountsService/users/$USERNAME
 sudo chown root:root /var/lib/AccountsService/users/$USERNAME
 sudo chmod 644 /var/lib/AccountsService/users/$USERNAME
 
@@ -57,7 +67,6 @@ sudo apt-get upgrade -y
 
 # 필요한 패키지 설치
 export DEBIAN_FRONTEND=noninteractive
-echo "lightdm shared/default-x-display-manager select lightdm" | sudo debconf-set-selections
 
 sudo apt-get install -y xrdp xfce4 xfce4-terminal
 sudo apt-get install vsftpd -y
@@ -102,24 +111,27 @@ fi
 
 # 설치 스크립트 생성
 # JetPack 설치 스크립트 생성
-cat <<EOT > /home/$USERNAME/install_nvidia_jetpack.sh
+
+mkdir -p /home/$USERNAME/scripts
+chown $USERNAME:$USERNAME /home/$USERNAME/scripts
+
+cat <<'EOT' > /home/$USERNAME/scripts/install_nvidia_jetpack.sh
 #!/bin/bash
-USERNAME=terry
-echo "\$(date): NVIDIA JetPack 설치 시작" >> /home/\$USERNAME/install_log.txt
-sudo apt install nvidia-jetpack -y >> /home/\$USERNAME/install_log.txt 2>&1
-echo "\$(date): NVIDIA JetPack 설치 완료" >> /home/\$USERNAME/install_log.txt
-rm -f /home/\$USERNAME/.config/autostart/nvidia_install.desktop
+echo "$(date): NVIDIA JetPack 설치 시작"
+sudo apt-get install -y nvidia-jetpack
+echo "$(date): NVIDIA JetPack 설치 완료"
+rm -f /home/$USER/.config/autostart/nvidia_install.desktop
 EOT
 
-chmod +x /home/$USERNAME/install_nvidia_jetpack.sh
-chown $USERNAME:$USERNAME /home/$USERNAME/install_nvidia_jetpack.sh
+chmod +x /home/$USERNAME/scripts/install_nvidia_jetpack.sh
+chown $USERNAME:$USERNAME /home/$USERNAME/scripts/install_nvidia_jetpack.sh
 
 # Autostart .desktop 생성
 mkdir -p /home/$USERNAME/.config/autostart
 cat <<EOF > /home/$USERNAME/.config/autostart/nvidia_install.desktop
 [Desktop Entry]
 Type=Application
-Exec=gnome-terminal -- bash -c '/home/$USERNAME/install_nvidia_jetpack.sh; exec bash'
+Exec=gnome-terminal -- bash -c '/home/$USERNAME/scripts/install_nvidia_jetpack.sh; exec bash'
 Hidden=false
 NoDisplay=false
 X-GNOME-Autostart-enabled=true
