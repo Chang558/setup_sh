@@ -52,6 +52,29 @@ else
     echo "/usr/local/lib/python3.8/dist-packages/torchvision-0.16.1+fdea156-py3.8-linux-aarch64.egg" | sudo tee /usr/local/lib/python3.8/dist-packages/torchvision.pth
 fi
 
+echo "===================cmake install ==================="
+CMAKE_VERSION=3.30.8
+
+# 현재 CMake 버전 확인
+CURRENT_CMAKE_VERSION=$(cmake --version 2>/dev/null | grep -oP '(?<=version )[^ ]+' || echo "0.0.0")
+
+# 버전 비교 함수
+version_ge() {
+    [ "$(printf '%s\n' "$1" "$2" | sort -V | head -n1)" = "$2" ]
+}
+
+if version_ge "$CURRENT_CMAKE_VERSION" "3.30.0"; then
+    echo "cmake 3.30 이상, 스킵"
+else
+    cd ~/library/etc
+    wget https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}.tar.gz
+    tar -zxvf cmake-${CMAKE_VERSION}.tar.gz
+    cd cmake-${CMAKE_VERSION}
+    ./bootstrap --prefix=/usr/local
+    make -j$(nproc)
+    sudo make install
+fi
+
 # Pillow 버전 설치( python 2.7이하는 필수 )
 #echo "Installing compatible Pillow version..."
 #pip install 'pillow<7'
@@ -81,19 +104,7 @@ if [[ "$BUILD_OPTION" == "1" || "$BUILD_OPTION" == "3" ]]; then
   sudo pip3 install tqdm==4.64.1 numpy==1.23.5 seaborn==0.11.2 imutils==0.5.4 ffmpeg-python==0.2.0 onnx 
   sudo apt-get install ffmpeg -y
 
-  echo "===================cmake install ==================="
-  cd ~/library/etc
-  wget https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}.tar.gz
-  CMAKE_VERSION=3.30.8
-
-  # 압축 해제
-  tar -zxvf cmake-${CMAKE_VERSION}.tar.gz
-  cd cmake-${CMAKE_VERSION}
-
-  # 빌드 및 설치
-  ./bootstrap --prefix=/usr/local
-  make -j$(nproc)
-  sudo make install
+  
 
   # pycuda 설치
   echo 'export PATH=/usr/local/cuda-11.4/bin:$PATH' >> ~/.bashrc
