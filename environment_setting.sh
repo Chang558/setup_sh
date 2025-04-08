@@ -37,9 +37,10 @@ gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-timeout 
 gsettings set org.gnome.desktop.session idle-delay 0
 EOL
 
-chmod +x /home/$USERNAME/gnome_power_settings.sh
-chown $USERNAME:$USERNAME /home/$USERNAME/gnome_power_settings.sh
+chmod +x /home/$USERNAME/scripts/gnome_power_settings.sh
+chown $USERNAME:$USERNAME /home/$USERNAME/scripts/gnome_power_settings.sh
 
+# 실행도 동일한 경로로
 sudo -u $USERNAME bash /home/$USERNAME/scripts/gnome_power_settings.sh
 
 # dpkg 잠금 파일 제거
