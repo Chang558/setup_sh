@@ -9,18 +9,18 @@ if ! sudo grep -q "$USERNAME ALL=NOPASSWD: ALL" /etc/sudoers; then
     echo "$USERNAME ALL=NOPASSWD: ALL" | sudo tee -a /etc/sudoers
 fi
 
-# 자동 로그인 설정 (gdm3용)
 sudo sed -i 's/^#*AutomaticLoginEnable.*/AutomaticLoginEnable=true/' /etc/gdm3/custom.conf
-sudo sed -i "s/^#*AutomaticLogin.*/AutomaticLogin=$USERNAME/" /etc/gdm3/custom.conf
-sudo sed -i 's/^#*TimedLoginEnable.*/TimedLoginEnable=true/' /etc/gdm3/custom.conf || echo "TimedLoginEnable=true" | sudo tee -a /etc/gdm3/custom.conf
-sudo sed -i "s/^#*TimedLogin.*/TimedLogin=$USERNAME/" /etc/gdm3/custom.conf || echo "TimedLogin=$USERNAME" | sudo tee -a /etc/gdm3/custom.conf
-sudo sed -i 's/^#*TimedLoginDelay.*/TimedLoginDelay=0/' /etc/gdm3/custom.conf || echo "TimedLoginDelay=0" | sudo tee -a /etc/gdm3/custom.conf
+sudo sed -i 's/^#*AutomaticLogin.*/AutomaticLogin=terry/' /etc/gdm3/custom.conf
+sudo sed -i 's/^#*TimedLoginEnable.*/TimedLoginEnable=true/' /etc/gdm3/custom.conf
+sudo sed -i 's/^#*TimedLogin.*/TimedLogin=terry/' /etc/gdm3/custom.conf
+sudo sed -i 's/^#*TimedLoginDelay.*/TimedLoginDelay=0/' /etc/gdm3/custom.conf
 
 # AccountsService 사용자 설정
 sudo mkdir -p /var/lib/AccountsService/users
+
 sudo bash -c "cat <<EOF > /var/lib/AccountsService/users/$USERNAME
 [User]
-Language=ko_KR.UTF-8
+Session=gnome
 XSession=gnome
 SystemAccount=false
 AutomaticLogin=true
@@ -28,11 +28,9 @@ EOF"
 
 sudo chown root:root /var/lib/AccountsService/users/$USERNAME
 sudo chmod 644 /var/lib/AccountsService/users/$USERNAME
-sudo chown root:root /var/lib/AccountsService/users/$USERNAME
-sudo chmod 644 /var/lib/AccountsService/users/$USERNAME
 
 # GNOME 화면 꺼짐 방지 스크립트 생성
-cat <<EOL > /home/$USERNAME/gnome_power_settings.sh
+cat <<EOL > /home/$USERNAME/scripts/gnome_power_settings.sh
 #!/bin/bash
 gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-type 'nothing'
 gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-timeout 0
@@ -42,21 +40,7 @@ EOL
 chmod +x /home/$USERNAME/gnome_power_settings.sh
 chown $USERNAME:$USERNAME /home/$USERNAME/gnome_power_settings.sh
 
-# 화면 꺼짐 방지 자동 실행 등록
-mkdir -p /home/$USERNAME/.config/autostart
-cat <<EOF > /home/$USERNAME/.config/autostart/gnome_power_settings.desktop
-[Desktop Entry]
-Type=Application
-Exec=/home/$USERNAME/gnome_power_settings.sh
-Hidden=false
-NoDisplay=false
-X-GNOME-Autostart-enabled=true
-Name=Disable GNOME Power Saving
-Comment=Prevent screen sleep on GNOME
-EOF
-
-chmod +x /home/$USERNAME/.config/autostart/gnome_power_settings.desktop
-chown $USERNAME:$USERNAME /home/$USERNAME/.config/autostart/gnome_power_settings.desktop
+sudo -u $USERNAME bash /home/$USERNAME/scripts/gnome_power_settings.sh
 
 # dpkg 잠금 파일 제거
 sudo rm -rf /var/lib/dpkg/lock /var/lib/dpkg/lock-frontend
