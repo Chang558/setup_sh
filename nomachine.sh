@@ -73,15 +73,18 @@ fi
 
 # Nomachine 설치
 echo ""
-cd ~/library
+mkdir -p ~/library/etc
+cd ~/library/etc
+
 wget https://download.nomachine.com/download/8.13/Arm/nomachine_8.13.1_1_aarch64.tar.gz -O nomachine.tar.gz
 tar -xvzf nomachine.tar.gz
 cd NX
 sudo ./nxserver --install
 cd ..
-sudo mv ~/library/etc nomachine.tar.gz NX
 
 echo ""
 echo "[1] Nomachine 설치 완료"
 echo ""
 
+cd ~/library/etc/NX
+sudo rm -rf *.gz

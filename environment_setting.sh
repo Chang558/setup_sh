@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 # 사용자 설정
 USERNAME=$(logname)
