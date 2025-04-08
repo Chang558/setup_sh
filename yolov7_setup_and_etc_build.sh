@@ -12,105 +12,92 @@ echo "3 - 둘 다 빌드"
 read -p "선택 (1/2/3): " BUILD_OPTION
 
 # PyTorch 설치
+# PyTorch 자동 확인 및 설치 (JetPack 5.1.2용)
 echo ""
-echo "===================[0] Installing dependencies for pytorch==================="
+echo "===================[0] Checking PyTorch installation for JetPack 5.1.2]==================="
 echo ""
 
-mkdir -p ~/library/etc
-cd ~/library/etc
+PYTORCH_VERSION=$(python3 -c "import torch; print(torch.__version__)" 2>/dev/null || echo "none")
 
-if python3 -c "import torch" &> /dev/null; then
+if [[ "$PYTORCH_VERSION" == "2.1.0a0+41361538.nv23.06" ]]; then
     echo "PyTorch가 이미 설치되어 있습니다. 설치를 건너뜁니다."
 else
-    if [ -f torch-2.1.0*.whl ]; then
-        echo "PyTorch wheel 파일이 이미 존재합니다. 다운로드 생략."
-    else
-        echo "PyTorch wheel 파일을 다운로드합니다..."
+    mkdir -p ~/library/etc
+    cd ~/library/etc
+    if [ ! -f torch-2.1.0a0+41361538.nv23.06-cp38-cp38-linux_aarch64.whl ]; then
         wget https://developer.download.nvidia.cn/compute/redist/jp/v512/pytorch/torch-2.1.0a0+41361538.nv23.06-cp38-cp38-linux_aarch64.whl
     fi
-
-    echo "PyTorch 설치 중..."
-    pip3 install torch-2.1.0*.whl
+    pip3 install torch-2.1.0a0+41361538.nv23.06-cp38-cp38-linux_aarch64.whl
 fi
 
-# 필수 라이브러리 설치
-echo ""
-echo "===================[1] Installing dependencies for torchvision==================="
-echo ""
-
-sudo apt-get update
-sudo apt-get install -y libjpeg-dev zlib1g-dev libpython3-dev libopenblas-dev libavcodec-dev libavformat-dev libswscale-dev
-sudo apt-get install build-essential python3-dev python3-pip libboost-python-dev libboost-thread-dev -y
 
 # TorchVision 설치
 echo ""
-read -p "TorchVision을 빌드여부 (y/n): " BUILD_TV
+echo "===================[1] Checking TorchVision installation for JetPack 5.1.2]==================="
+echo ""
 
-if [[ "$BUILD_TV" == "y" || "$BUILD_TV" == "Y" ]]; then
-  echo ""
-  echo "===================[2] Cloning and installing torchvision==================="
-  echo ""
+TV_VERSION=$(python3 -c "import torchvision; print(torchvision.__version__)" 2>/dev/null || echo "none")
 
-  cd ~/library
-  git clone --branch v0.16.1 https://github.com/pytorch/vision torchvision
-  cd torchvision
-  echo "export BUILD_VERSION=0.16.1" >> ~/.bashrc
-  source ~/.bashrc
-  echo "After sourcing: $BUILD_VERSION"  # 0.16.1 출력
-  sleep 5
-  python3 setup.py install --user
-  sudo cp -r ~/.local/lib/python3.8/site-packages/torchvision* /usr/local/lib/python3.8/dist-packages/
-  echo "/usr/local/lib/python3.8/dist-packages/torchvision-0.16.1+fdea156-py3.8-linux-aarch64.egg" | sudo tee /usr/local/lib/python3.8/dist-packages/torchvision.pth
-  cd ~
+if [[ "$TV_VERSION" == "0.16.1+fdea156" ]]; then
+    echo "TorchVision가 이미 설치되어 있습니다. "
 else
-  echo "TorchVision 설치 패스."
+    sudo apt-get install -y libjpeg-dev zlib1g-dev libpython3-dev libopenblas-dev libavcodec-dev libavformat-dev libswscale-dev
+    sudo apt-get install -y build-essential python3-dev python3-pip libboost-python-dev libboost-thread-dev
+
+    cd ~/library
+    git clone --branch v0.16.1 https://github.com/pytorch/vision torchvision
+    cd torchvision
+    python3 setup.py install --user
+    sudo cp -r ~/.local/lib/python3.8/site-packages/torchvision* /usr/local/lib/python3.8/dist-packages/
+    echo "/usr/local/lib/python3.8/dist-packages/torchvision-0.16.1+fdea156-py3.8-linux-aarch64.egg" | sudo tee /usr/local/lib/python3.8/dist-packages/torchvision.pth
 fi
 
 # Pillow 버전 설치( python 2.7이하는 필수 )
 #echo "Installing compatible Pillow version..."
 #pip install 'pillow<7'
-
-# JetsonYoloV7-TensorRT 깃 클론
-echo ""
-echo "===================[3] Cloning JetsonYoloV7-TensorRT repository==================="
-echo ""
-
-# YOLOv7 repo 클론
-mkdir p- ~/yolo
-cd ~/yolo
-
-if [ -d "JetsonYoloV7-TensorRT" ]; then
-    echo "JetsonYoloV7-TensorRT 디렉토리가 이미 존재합니다. 클론 생략."
-else
-    git clone https://github.com/mailrocketsystems/JetsonYoloV7-TensorRT.git
-fi
-
-# 기타 종속성 설치
-echo ""
-echo "===================[4] Installing other dependencies==================="
-echo ""
-
-sudo pip3 install tqdm==4.64.1 numpy==1.23.5 seaborn==0.11.2 imutils==0.5.4 ffmpeg-python==0.2.0 onnx cmake
-sudo apt-get install ffmpeg -y
-
-# pycuda 설치
-echo 'export PATH=/usr/local/cuda-11.4/bin:$PATH' >> ~/.bashrc
-echo 'export LD_LIBRARY_PATH=/usr/local/cuda-11.4/lib64:$LD_LIBRARY_PATH' >> ~/.bashrc
-source ~/.bashrc
-
-if ! command -v nvcc &> /dev/null; then
-    echo "nvcc 명령어 에러. 확인 필요"
-    exit 1
-fi
-
-python3 -m pip install pycuda --user
-sudo cp -r /home/terry/.local/lib/python3.8/site-packages/pycuda* /usr/lib/python3.8/dist-packages
-
 if [[ "$BUILD_OPTION" == "1" || "$BUILD_OPTION" == "3" ]]; then
+
+
+  # JetsonYoloV7-TensorRT 깃 클론
+  echo ""
+  echo "===================[2] Cloning JetsonYoloV7-TensorRT repository==================="
+  echo ""
+
+  # YOLOv7 repo 클론
+  mkdir p- ~/yolo
+  cd ~/yolo
+
+  if [ -d "JetsonYoloV7-TensorRT" ]; then
+      echo "JetsonYoloV7-TensorRT 디렉토리가 이미 존재합니다. 클론 생략."
+  else
+      git clone https://github.com/mailrocketsystems/JetsonYoloV7-TensorRT.git
+  fi
+
+  # 기타 종속성 설치
+  echo ""
+  echo "===================[3] Installing other dependencies==================="
+  echo ""
+
+  sudo pip3 install tqdm==4.64.1 numpy==1.23.5 seaborn==0.11.2 imutils==0.5.4 ffmpeg-python==0.2.0 onnx cmake
+  sudo apt-get install ffmpeg -y
+
+  # pycuda 설치
+  echo 'export PATH=/usr/local/cuda-11.4/bin:$PATH' >> ~/.bashrc
+  echo 'export LD_LIBRARY_PATH=/usr/local/cuda-11.4/lib64:$LD_LIBRARY_PATH' >> ~/.bashrc
+  source ~/.bashrc
+
+  if ! command -v nvcc &> /dev/null; then
+      echo "nvcc 명령어 에러. 확인 필요"
+      exit 1
+  fi
+
+  python3 -m pip install pycuda --user
+  sudo cp -r /home/terry/.local/lib/python3.8/site-packages/pycuda* /usr/lib/python3.8/dist-packages
+
 
   # YOLOv7 모델 가중치 변환
   echo ""
-  echo "===================[5] Generating weights file==================="
+  echo "===================[4] Generating weights file==================="
   echo ""
 
   cd ~/yolo/JetsonYoloV7-TensorRT
@@ -128,7 +115,7 @@ if [[ "$BUILD_OPTION" == "1" || "$BUILD_OPTION" == "3" ]]; then
 
   # 스왑 파일 설정 (메모리 부족 시)
   echo ""
-  echo "===================[6] Checking for memory issues==================="
+  echo "===================[5] Checking for memory issues==================="
   echo ""
 
   mem=$( free -h | grep Mem | awk '{print $7}' | sed 's/Gi//')
@@ -149,23 +136,33 @@ if [[ "$BUILD_OPTION" == "1" || "$BUILD_OPTION" == "3" ]]; then
 
   # YOLOv7 엔진으로 이미지 처리
   echo ""
-  echo "===================[7] Running YOLOv7 detection==================="
+  echo "===================[6] Running YOLOv7 detection==================="
   echo ""
 
   sudo ./yolov7 -d yolov7-tiny.engine ../images
 fi
+
 if [[ "$BUILD_OPTION" == "2" || "$BUILD_OPTION" == "3" ]]; then
     echo ""
-    echo "===================[8] YOLOv8 engine build==================="
+    echo "===================[7] YOLOv8-pose engine build==================="
     echo ""
 
     # yolov8 requirements.txt 
-
+    sudo pip3 install python-dateutil==2.8.2
     sudo pip3 install numpy==1.23.5
     sudo pip3 install onnx 
-    sudo pip3 install onnxsim
     sudo pip3 install opencv-python
     sudo pip3 install ultralytics
+    echo "===================onnxsim 설치 중...==================="
+
+
+    cd ~/library
+    sudo rm -rf onnx-simplifier
+    git clone https://github.com/daquexian/onnx-simplifier.git
+
+    cd onnx-simplifier
+    pip3 install -r requirements.txt
+    python3 setup.py install --user
 
     mkdir -p ~/yolo
     cd ~/yolo
