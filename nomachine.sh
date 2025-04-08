@@ -73,24 +73,26 @@ else
   echo "IP 설정을 건너뜁니다."
 fi
 
-# Nomachine 설치
 echo ""
-mkdir -p /home/terry/library/etc
-cd ~/library/etc
+INSTALL_DIR=/home/terry/library/etc
+mkdir -p "$INSTALL_DIR"
+cd "$INSTALL_DIR"
 
-chmod 555 .
+chmod 555 "$INSTALL_DIR"
 
-sudo rm -rf NX nomachine.tar.gz
+sudo rm -rf "$INSTALL_DIR/NX" "$INSTALL_DIR/nomachine.tar.gz"
+
 wget https://download.nomachine.com/download/8.13/Arm/nomachine_8.13.1_1_aarch64.tar.gz -O nomachine.tar.gz
-
 tar -xvzf nomachine.tar.gz
-cd NX
+
+cd "$INSTALL_DIR/NX"
 sudo ./nxserver --install
-cd ..
+
+cd "$INSTALL_DIR"
+chmod 755 "$INSTALL_DIR"
 
 echo ""
 echo "[1] Nomachine 설치 완료"
 echo ""
 
-cd ~/library/etc/NX
-sudo rm -rf *.gz
+sudo rm -rf "$INSTALL_DIR/NX/"*.gz
