@@ -1,5 +1,5 @@
 #!/bin/bash
-set -euo pipefail
+set -e
 
 # 사용자 설정
 USERNAME=$(logname)
@@ -14,11 +14,12 @@ if ! sudo grep -q "$USERNAME ALL=NOPASSWD: ALL" /etc/sudoers; then
     echo "$USERNAME ALL=NOPASSWD: ALL" | sudo tee -a /etc/sudoers
 fi
 
-sudo sed -i 's/^#*AutomaticLoginEnable.*/AutomaticLoginEnable=true/' /etc/gdm3/custom.conf
-sudo sed -i 's/^#*AutomaticLogin.*/AutomaticLogin=terry/' /etc/gdm3/custom.conf
-sudo sed -i 's/^#*TimedLoginEnable.*/TimedLoginEnable=true/' /etc/gdm3/custom.conf
-sudo sed -i 's/^#*TimedLogin.*/TimedLogin=terry/' /etc/gdm3/custom.conf
-sudo sed -i 's/^#*TimedLoginDelay.*/TimedLoginDelay=0/' /etc/gdm3/custom.conf
+sudo sed -i 's/^[# ]*AutomaticLoginEnable[ ]*=.*/AutomaticLoginEnable=true/' /etc/gdm3/custom.conf
+sudo sed -i 's/^[# ]*AutomaticLogin[ ]*=.*/AutomaticLogin=terry/' /etc/gdm3/custom.conf
+sudo sed -i 's/^[# ]*TimedLoginEnable[ ]*=.*/TimedLoginEnable=true/' /etc/gdm3/custom.conf
+sudo sed -i 's/^[# ]*TimedLogin[ ]*=.*/TimedLogin=terry/' /etc/gdm3/custom.conf
+sudo sed -i 's/^[# ]*TimedLoginDelay[ ]*=.*/TimedLoginDelay=0/' /etc/gdm3/custom.conf
+
 
 # AccountsService 사용자 설정
 sudo mkdir -p /var/lib/AccountsService/users
@@ -61,7 +62,11 @@ sudo apt-get upgrade -y
 # 필요한 패키지 설치
 export DEBIAN_FRONTEND=noninteractive
 
-sudo apt-get install -y xrdp xfce4 xfce4-terminal
+echo "gdm3 shared/default-x-display-manager select gdm3" | sudo debconf-set-selections
+
+sudo apt-get install -y -o Dpkg::Options::="--force-confdef" \
+                        -o Dpkg::Options::="--force-confold" xrdp
+sudo apt-get install -y xfce4 xfce4-terminal
 sudo apt-get install vsftpd -y
 sudo apt-get install python3-pip -y
 sudo apt-get install nodejs -y
@@ -133,5 +138,6 @@ chown $USERNAME:$USERNAME /home/$USERNAME/.config/autostart/nvidia_install.deskt
 
 source ~/.bashrc
 
+echo "스크립트 끝까지 도달함"
 # 재부팅
 sudo reboot
