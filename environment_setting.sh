@@ -114,7 +114,7 @@ cat <<'EOT' > /home/$USERNAME/scripts/install_nvidia_jetpack.sh
 echo "$(date): NVIDIA JetPack 설치 시작"
 sudo apt-get install -y nvidia-jetpack
 echo "$(date): NVIDIA JetPack 설치 완료"
-rm -f /home/$USER/.config/autostart/nvidia_install.desktop
+sudo rm -rf /home/$USER/.config/autostart/nvidia_install.desktop
 EOT
 
 chmod +x /home/$USERNAME/scripts/install_nvidia_jetpack.sh
