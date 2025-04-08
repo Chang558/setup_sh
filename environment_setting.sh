@@ -4,6 +4,11 @@ set -euo pipefail
 # 사용자 설정
 USERNAME=$(logname)
 
+if [ "$EUID" -ne 0 ]; then
+  echo "이 스크립트는 root 권한으로 실행되어야 합니다. sudo로 실행하세요."
+  exit 1
+fi
+
 # sudoers에 안전한 방식으로 추가 (중복 확인 후 추가)
 if ! sudo grep -q "$USERNAME ALL=NOPASSWD: ALL" /etc/sudoers; then
     echo "$USERNAME ALL=NOPASSWD: ALL" | sudo tee -a /etc/sudoers
@@ -28,6 +33,9 @@ EOF"
 
 sudo chown root:root /var/lib/AccountsService/users/$USERNAME
 sudo chmod 644 /var/lib/AccountsService/users/$USERNAME
+
+mkdir -p /home/$USERNAME/scripts
+chown $USERNAME:$USERNAME /home/$USERNAME/scripts
 
 # GNOME 화면 꺼짐 방지 스크립트 생성
 cat <<EOL > /home/$USERNAME/scripts/gnome_power_settings.sh
@@ -96,9 +104,6 @@ fi
 
 # 설치 스크립트 생성
 # JetPack 설치 스크립트 생성
-
-mkdir -p /home/$USERNAME/scripts
-chown $USERNAME:$USERNAME /home/$USERNAME/scripts
 
 cat <<'EOT' > /home/$USERNAME/scripts/install_nvidia_jetpack.sh
 #!/bin/bash
