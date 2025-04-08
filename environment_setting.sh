@@ -70,7 +70,6 @@ sudo apt-get install npm -y
 # 한글 환경 설정
 sudo apt-get install -y language-pack-ko fonts-nanum fonts-nanum-coding ibus ibus-hangul
 sudo update-locale LANG=ko_KR.UTF-8
-
 grep -q 'GTK_IM_MODULE=ibus' /etc/environment || echo "GTK_IM_MODULE=ibus" | sudo tee -a /etc/environment
 grep -q 'QT_IM_MODULE=ibus' /etc/environment || echo "QT_IM_MODULE=ibus" | sudo tee -a /etc/environment
 grep -q 'XMODIFIERS=@im=ibus' /etc/environment || echo "XMODIFIERS=@im=ibus" | sudo tee -a /etc/environment

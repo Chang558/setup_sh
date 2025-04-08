@@ -6,7 +6,9 @@ echo ""
 
 sudo apt-get -y install ifupdown
 
+echo ""
 read -p "IP 주소 변경여부 (y/n): " SET_IP
+echo ""
 
 if [[ "$SET_IP" == "y" ]]; then
   IFACE_FILE="/etc/network/interfaces"
@@ -73,10 +75,14 @@ fi
 
 # Nomachine 설치
 echo ""
-mkdir -p ~/library/etc
+mkdir -p /home/terry/library/etc
 cd ~/library/etc
 
+chmod 555 .
+
+sudo rm -rf NX nomachine.tar.gz
 wget https://download.nomachine.com/download/8.13/Arm/nomachine_8.13.1_1_aarch64.tar.gz -O nomachine.tar.gz
+
 tar -xvzf nomachine.tar.gz
 cd NX
 sudo ./nxserver --install
