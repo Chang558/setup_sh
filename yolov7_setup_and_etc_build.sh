@@ -78,8 +78,22 @@ if [[ "$BUILD_OPTION" == "1" || "$BUILD_OPTION" == "3" ]]; then
   echo "===================[3] Installing other dependencies==================="
   echo ""
 
-  sudo pip3 install tqdm==4.64.1 numpy==1.23.5 seaborn==0.11.2 imutils==0.5.4 ffmpeg-python==0.2.0 onnx cmake
+  sudo pip3 install tqdm==4.64.1 numpy==1.23.5 seaborn==0.11.2 imutils==0.5.4 ffmpeg-python==0.2.0 onnx 
   sudo apt-get install ffmpeg -y
+
+  echo "===================cmake install ==================="
+  cd ~/library/etc
+  wget https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}.tar.gz
+  CMAKE_VERSION=3.30.8
+
+  # 압축 해제
+  tar -zxvf cmake-${CMAKE_VERSION}.tar.gz
+  cd cmake-${CMAKE_VERSION}
+
+  # 빌드 및 설치
+  ./bootstrap --prefix=/usr/local
+  make -j$(nproc)
+  sudo make install
 
   # pycuda 설치
   echo 'export PATH=/usr/local/cuda-11.4/bin:$PATH' >> ~/.bashrc
@@ -161,8 +175,16 @@ if [[ "$BUILD_OPTION" == "2" || "$BUILD_OPTION" == "3" ]]; then
     git clone https://github.com/daquexian/onnx-simplifier.git
 
     cd onnx-simplifier
+    
+    sed -i 's|git@github.com:onnx/optimizer.git|https://github.com/onnx/optimizer.git|' .gitmodules
+    sed -i 's|git@github.com:microsoft/onnxruntime.git|https://github.com/microsoft/onnxruntime.git|' .gitmodules
+    sed -i 's|git@github.com:pybind/pybind11.git|https://github.com/pybind/pybind11.git|' .gitmodules
+
+    git submodule sync
+    git submodule update --init --recursive
+
     pip3 install -r requirements.txt
-    python3 setup.py install --user
+    sudo python3 setup.py install 
 
     mkdir -p ~/yolo
     cd ~/yolo
@@ -173,15 +195,7 @@ if [[ "$BUILD_OPTION" == "2" || "$BUILD_OPTION" == "3" ]]; then
 
     yolo export model=yolov8s-pose.pt format=onnx opset=11 simplify=True
 
-    /usr/src/tensorrt/bin/trtexec \
-      --onnx=yolov8s-pose.onnx \
-      --saveEngine=yolov8s-pose.engine \
-      --fp16
+    /usr/src/tensorrt/bin/trtexec --onnx=yolov8s-pose.onnx --saveEngine=yolov8s-pose.engine --fp16
 
-    python3 infer-pose.py \
-      --engine yolov8s-pose.engine \
-      --imgs data \
-      --show \
-      --out-dir outputs \
-      --device cuda:0
+    python3 infer-pose.py --engine yolov8s-pose.engine --imgs data --show --out-dir outputs --device cuda:0
 fi
