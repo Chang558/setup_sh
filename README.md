@@ -10,6 +10,7 @@ Jetson 기본 환경 설정 및 구축
 
 ### yolov7 setup && pytorch build.sh
 yolov7-tiny.pt을 TensorRT 엔진으로 변환하며, 이에 필요한 PyTorch와 Torchvision을 호환성에 맞춰 빌드
+
 version:
    PyTorch v2.0.1
    Torchvision v0.16.1
