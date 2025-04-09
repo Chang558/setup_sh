@@ -123,7 +123,7 @@ if [[ "$BUILD_OPTION" == "1" || "$BUILD_OPTION" == "3" ]]; then
   fi
 
   python3 -m pip install pycuda --user
-  sudo cp -r /home/terry/.local/lib/python3.8/site-packages/pycuda* /usr/lib/python3.8/dist-packages
+  #sudo cp -r /home/terry/.local/lib/python3.8/site-packages/pycuda* /usr/lib/python3.8/dist-packages
 
 
   # YOLOv7 모델 가중치 변환
