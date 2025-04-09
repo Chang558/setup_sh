@@ -152,7 +152,7 @@ if [[ "$BUILD_OPTION" == "1" || "$BUILD_OPTION" == "3" ]]; then
   mem=$( free -h | grep Mem | awk '{print $7}' | sed 's/Gi//')
   if (( $(echo "$mem < 3" | bc -l) ));then
     echo "Memory issue detected, creating swapfile..."
-    sudo dd if=/dev/zero of=/swapfile bs=1M count=4096
+    sudo dd if=/dev/zero of=/swapfile bs=1M count=10240
     sudo chmod 600 /swapfile
     sudo mkswap /swapfile
     sudo swapon /swapfile
