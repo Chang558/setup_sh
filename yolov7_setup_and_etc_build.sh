@@ -170,7 +170,11 @@ if [[ "$BUILD_OPTION" == "1" || "$BUILD_OPTION" == "3" ]]; then
   echo "===================[6] Running YOLOv7 detection==================="
   echo ""
 
-  sudo ./yolov7 -d yolov7-tiny.engine ../images
+  if sudo ./yolov7 -d yolov7-tiny.engine ../images; then
+      echo "YOLOv7 Inference Success!"
+  else
+      echo "YOLOv7 Inference Failed."
+fi
 fi
 
 if [[ "$BUILD_OPTION" == "2" || "$BUILD_OPTION" == "3" ]]; then
