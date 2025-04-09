@@ -143,26 +143,35 @@ if [[ "$BUILD_OPTION" == "1" || "$BUILD_OPTION" == "3" ]]; then
   cp ../../yolov7-tiny.wts .
   sudo cmake .. && sudo make
 
-
   # 스왑 파일 설정 (메모리 부족 시)
   echo ""
-  echo "===================[5] Checking for memory issues==================="
+  echo "===================[5] Make Swapfile==================="
   echo ""
 
+  if [ -f /swapfile ]; then
+  echo "스왑 파일이 이미 존재합니다. 생성하지 않습니다."
+  else
   mem=$( free -h | grep Mem | awk '{print $7}' | sed 's/Gi//')
-  if (( $(echo "$mem < 3" | bc -l) ));then
+  if (( $(echo "$mem < 3" | bc -l) )); then
+    echo ""
     echo "Memory issue detected, creating swapfile..."
+    echo ""
     sudo dd if=/dev/zero of=/swapfile bs=1M count=10240
     sudo chmod 600 /swapfile
     sudo mkswap /swapfile
     sudo swapon /swapfile
     swapon --show
   else
-    echo "No memory issues detected."
+    echo ""
+    echo "메모리 충분. 스왑 파일 생성 생략."
+    echo ""
+  fi
   fi
 
   # YOLOv7 엔진 생성 및 실행
+  echo ""
   echo "Generating and running YOLOv7 engine..."
+  echo ""
   sudo ./yolov7 -s yolov7-tiny.wts yolov7-tiny.engine t
 
   # YOLOv7 엔진으로 이미지 처리
