@@ -4,7 +4,7 @@ set -e
 USERNAME=${SUDO_USER:-$USER}
 
 #sudo chown -R $USER:$USER /home/terry/
-sudo find /home/terry -mindepth 1 -maxdepth 1 ! -name ".ssh" ! -name "thinclient_drives" -exec chown -R terry:terry {} \;
+sudo find /home/terry -mindepth 1 -maxdepth 1 -not -path "/home/terry/thinclient_drives" -exec chown -R terry:terry {} \; 2>/dev/null
 
 sudo chown -R terry:terry /home/terry/.ssh
 sudo chmod 700 /home/terry/.ssh
