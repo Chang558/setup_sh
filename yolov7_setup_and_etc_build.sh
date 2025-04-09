@@ -23,7 +23,7 @@ echo ""
 echo "===================[0] Checking PyTorch installation for JetPack 5.1.2]==================="
 echo ""
 
-PYTORCH_VERSION=$(python3 -c "import torch; print(torch.__version__)" 2>/dev/null || echo "none")
+PYTORCH_VERSION=$(python3 -c "import torch; print(torch.__version__)" 2>/dev/null || echo "none") || true
 
 mkdir -p /home/terry/library/etc
 cd /home/terry/library/etc
