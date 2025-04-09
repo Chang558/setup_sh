@@ -1,5 +1,7 @@
 #!/bin/bash
-set -euo pipefail
+set -e
+
+USERNAME=$(logname)
 
 #sudo chown -R $USER:$USER ~/
 sudo find ~ -mindepth 1 -maxdepth 1 ! -name "thinclient_drives" -exec chown -R $USER:$USER {} \;
@@ -87,7 +89,8 @@ if [[ "$BUILD_OPTION" == "1" || "$BUILD_OPTION" == "3" ]]; then
   echo ""
 
   # YOLOv7 repo 클론
-  mkdir p- ~/yolo
+
+  mkdir -p /home/terry/yolo
   cd ~/yolo
 
   if [ -d "JetsonYoloV7-TensorRT" ]; then
@@ -104,12 +107,15 @@ if [[ "$BUILD_OPTION" == "1" || "$BUILD_OPTION" == "3" ]]; then
   sudo pip3 install tqdm==4.64.1 numpy==1.23.5 seaborn==0.11.2 imutils==0.5.4 ffmpeg-python==0.2.0 onnx 
   sudo apt-get install ffmpeg -y
 
-  
-
   # pycuda 설치
-  echo 'export PATH=/usr/local/cuda-11.4/bin:$PATH' >> ~/.bashrc
-  echo 'export LD_LIBRARY_PATH=/usr/local/cuda-11.4/lib64:$LD_LIBRARY_PATH' >> ~/.bashrc
-  source ~/.bashrc
+  echo 'export PATH=/usr/local/cuda-11.4/bin:$PATH' >> /home/$USERNAME/.bashrc
+  echo 'export LD_LIBRARY_PATH=/usr/local/cuda-11.4/lib64:$LD_LIBRARY_PATH' >> /home/$USERNAME/.bashrc
+
+  export PATH=/usr/local/cuda-11.4/bin:$PATH
+  export LD_LIBRARY_PATH=/usr/local/cuda-11.4/lib64:$LD_LIBRARY_PATH
+  # 적용은 다음 로그인 때 반영되므로 지금 쉘에서 직접 적용
+  sudo -u $USERNAME bash -c "source /home/$USERNAME/.bashrc"
+
 
   if ! command -v nvcc &> /dev/null; then
       echo "nvcc 명령어 에러. 확인 필요"
