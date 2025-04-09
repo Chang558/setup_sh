@@ -3,8 +3,8 @@ set -e
 
 USERNAME=$(logname)
 
-#sudo chown -R $USER:$USER ~/
-sudo find ~ -mindepth 1 -maxdepth 1 ! -name "thinclient_drives" -exec chown -R $USER:$USER {} \;
+#sudo chown -R $USER:$USER /home/terry/
+sudo find /home/terry -mindepth 1 -maxdepth 1 ! -name "thinclient_drives" -exec chown -R $USER:$USER {} \;
 
 echo ""
 echo "YOLO 엔진 빌드 선택:"
@@ -24,8 +24,8 @@ PYTORCH_VERSION=$(python3 -c "import torch; print(torch.__version__)" 2>/dev/nul
 if [[ "$PYTORCH_VERSION" == "2.1.0a0+41361538.nv23.06" ]]; then
     echo "PyTorch가 이미 설치되어 있습니다. 설치를 건너뜁니다."
 else
-    mkdir -p ~/library/etc
-    cd ~/library/etc
+    mkdir -p /home/terry/library/etc
+    cd /home/terry/library/etc
     if [ ! -f torch-2.1.0a0+41361538.nv23.06-cp38-cp38-linux_aarch64.whl ]; then
         wget https://developer.download.nvidia.cn/compute/redist/jp/v512/pytorch/torch-2.1.0a0+41361538.nv23.06-cp38-cp38-linux_aarch64.whl
     fi
@@ -46,11 +46,11 @@ else
     sudo apt-get install -y libjpeg-dev zlib1g-dev libpython3-dev libopenblas-dev libavcodec-dev libavformat-dev libswscale-dev
     sudo apt-get install -y build-essential python3-dev python3-pip libboost-python-dev libboost-thread-dev
 
-    cd ~/library
+    cd /home/terry/library
     git clone --branch v0.16.1 https://github.com/pytorch/vision torchvision
     cd torchvision
     python3 setup.py install --user
-    sudo cp -r ~/.local/lib/python3.8/site-packages/torchvision* /usr/local/lib/python3.8/dist-packages/
+    sudo cp -r /home/terry/.local/lib/python3.8/site-packages/torchvision* /usr/local/lib/python3.8/dist-packages/
     echo "/usr/local/lib/python3.8/dist-packages/torchvision-0.16.1+fdea156-py3.8-linux-aarch64.egg" | sudo tee /usr/local/lib/python3.8/dist-packages/torchvision.pth
 fi
 
@@ -68,7 +68,7 @@ version_ge() {
 if version_ge "$CURRENT_CMAKE_VERSION" "3.30.0"; then
     echo "cmake 3.30 이상, 스킵"
 else
-    cd ~/library/etc
+    cd /home/terry/library/etc
     wget https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}.tar.gz
     tar -zxvf cmake-${CMAKE_VERSION}.tar.gz
     cd cmake-${CMAKE_VERSION}
@@ -91,7 +91,7 @@ if [[ "$BUILD_OPTION" == "1" || "$BUILD_OPTION" == "3" ]]; then
   # YOLOv7 repo 클론
 
   mkdir -p /home/terry/yolo
-  cd ~/yolo
+  cd /home/terry/yolo
 
   if [ -d "JetsonYoloV7-TensorRT" ]; then
       echo "JetsonYoloV7-TensorRT 디렉토리가 이미 존재합니다. 클론 생략."
@@ -131,7 +131,7 @@ if [[ "$BUILD_OPTION" == "1" || "$BUILD_OPTION" == "3" ]]; then
   echo "===================[4] Generating weights file==================="
   echo ""
 
-  cd ~/yolo/JetsonYoloV7-TensorRT
+  cd /home/terry/yolo/JetsonYoloV7-TensorRT
   python3 gen_wts.py -w yolov7-tiny.pt -o yolov7-tiny.wts
 
   # YOLOv7 엔진 빌드
@@ -191,7 +191,7 @@ if [[ "$BUILD_OPTION" == "2" || "$BUILD_OPTION" == "3" ]]; then
     echo "===================onnxsim 설치 중...==================="
 
 
-    cd ~/library
+    cd /home/terry/library
     sudo rm -rf onnx-simplifier
     git clone https://github.com/daquexian/onnx-simplifier.git
 
@@ -207,8 +207,8 @@ if [[ "$BUILD_OPTION" == "2" || "$BUILD_OPTION" == "3" ]]; then
     pip3 install -r requirements.txt
     sudo python3 setup.py install 
 
-    mkdir -p ~/yolo
-    cd ~/yolo
+    mkdir -p /home/terry/yolo
+    cd /home/terry/yolo
     if [ ! -d YOLOv8-TensorRT ]; then
         git clone https://github.com/triple-Mu/YOLOv8-TensorRT.git
     fi
@@ -218,5 +218,10 @@ if [[ "$BUILD_OPTION" == "2" || "$BUILD_OPTION" == "3" ]]; then
 
     /usr/src/tensorrt/bin/trtexec --onnx=yolov8s-pose.onnx --saveEngine=yolov8s-pose.engine --fp16
 
-    python3 infer-pose.py --engine yolov8s-pose.engine --imgs data --show --out-dir outputs --device cuda:0
+    echo ""
+    echo "===================[8] YOLOv8-pose engine inference==================="
+    echo ""
+    python3 infer-pose.py --engine yolov8s-pose.engine --imgs data --out-dir outputs --device cuda:0
+
+
 fi
