@@ -1,13 +1,17 @@
 #!/bin/bash
 set -e
 
-# 사용자 설정
-USERNAME=$(logname)
+USERNAME=${SUDO_USER:-$USER}
+
+# 사용자 권한 변경
 
 if [ "$EUID" -ne 0 ]; then
   echo "이 스크립트는 root 권한으로 실행되어야 합니다. sudo로 실행하세요."
   exit 1
 fi
+
+sudo find /home/terry -mindepth 1 -maxdepth 1 ! -name "thinclient_drives" -exec chown -R $USERNAME:$USERNAME {} \; 2>/dev/null
+
 
 # sudoers에 안전한 방식으로 추가 (중복 확인 후 추가)
 if ! sudo grep -q "$USERNAME ALL=NOPASSWD: ALL" /etc/sudoers; then

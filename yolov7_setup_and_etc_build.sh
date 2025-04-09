@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-USERNAME=$(logname)
+USERNAME=${SUDO_USER:-$USER}
 
 #sudo chown -R $USER:$USER /home/terry/
 sudo find /home/terry -mindepth 1 -maxdepth 1 ! -name "thinclient_drives" -exec chown -R $USER:$USER {} \;
