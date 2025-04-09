@@ -17,6 +17,19 @@ echo "2 - YOLOv8-pose만 빌드"
 echo "3 - 둘 다 빌드"
 read -p "선택 (1/2/3): " BUILD_OPTION
 
+echo ""
+read -p "현재 환경이 원격 데스크톱 또는 GUI 환경인가요? (y/n): " IS_GUI
+
+if [[ "$IS_GUI" == "y" || "$IS_GUI" == "Y" ]]; then
+    echo "OpenCV (GUI 포함) 버전을 설치합니다."
+    pip3 install opencv-python --upgrade
+else
+    echo "OpenCV headless 버전을 설치합니다."
+    pip3 uninstall -y opencv-python
+    pip3 install opencv-python-headless --upgrade
+fi
+
+
 # PyTorch 설치
 # PyTorch 자동 확인 및 설치 (JetPack 5.1.2용)
 echo ""
@@ -201,7 +214,7 @@ if [[ "$BUILD_OPTION" == "2" || "$BUILD_OPTION" == "3" ]]; then
     sudo pip3 install python-dateutil==2.8.2
     sudo pip3 install numpy==1.23.5
     sudo pip3 install onnx 
-    sudo pip3 install opencv-python
+    #sudo pip3 install opencv-python
     sudo pip3 install ultralytics
     echo "===================onnxsim 설치 중...==================="
 
