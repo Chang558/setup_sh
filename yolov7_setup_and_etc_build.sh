@@ -25,11 +25,13 @@ echo ""
 
 PYTORCH_VERSION=$(python3 -c "import torch; print(torch.__version__)" 2>/dev/null || echo "none")
 
+mkdir -p /home/terry/library/etc
+cd /home/terry/library/etc
+
 if [[ "$PYTORCH_VERSION" == "2.1.0a0+41361538.nv23.06" ]]; then
+
     echo "PyTorch가 이미 설치되어 있습니다. 설치를 건너뜁니다."
 else
-    mkdir -p /home/terry/library/etc
-    cd /home/terry/library/etc
     if [ ! -f torch-2.1.0a0+41361538.nv23.06-cp38-cp38-linux_aarch64.whl ]; then
         wget https://developer.download.nvidia.cn/compute/redist/jp/v512/pytorch/torch-2.1.0a0+41361538.nv23.06-cp38-cp38-linux_aarch64.whl
     fi
