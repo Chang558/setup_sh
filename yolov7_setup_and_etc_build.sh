@@ -69,7 +69,7 @@ else
     git clone --branch v0.16.1 https://github.com/pytorch/vision torchvision
     cd torchvision
     python3 setup.py install --user
-    sudo cp -r /home/terry/.local/lib/python3.8/site-packages/torchvision* /usr/local/lib/python3.8/dist-packages/
+    #sudo cp -r /home/terry/.local/lib/python3.8/site-packages/torchvision* /usr/local/lib/python3.8/dist-packages/
     echo "/usr/local/lib/python3.8/dist-packages/torchvision-0.16.1+fdea156-py3.8-linux-aarch64.egg" | sudo tee /usr/local/lib/python3.8/dist-packages/torchvision.pth
 fi
 
