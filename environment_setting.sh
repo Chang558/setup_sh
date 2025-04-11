@@ -63,6 +63,7 @@ sudo apt-get upgrade -y
 export DEBIAN_FRONTEND=noninteractive
 
 echo "gdm3 shared/default-x-display-manager select gdm3" | sudo debconf-set-selections
+sudo apt-get install -y gdm3
 
 sudo apt-get install -y -o Dpkg::Options::="--force-confdef" \
                         -o Dpkg::Options::="--force-confold" xrdp
