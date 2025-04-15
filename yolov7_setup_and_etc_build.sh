@@ -18,7 +18,7 @@ echo "3 - 둘 다 빌드"
 read -p "선택 (1/2/3): " BUILD_OPTION
 
 echo ""
-read -p "현재 환경이 원격 데스크톱 또는 GUI 환경인가요? (y/n): " IS_GUI
+read -p "Jetson GUI 환경인가요? (y/n): " IS_GUI
 
 if [[ "$IS_GUI" == "y" || "$IS_GUI" == "Y" ]]; then
     echo "OpenCV (GUI 포함) 버전을 설치합니다."
