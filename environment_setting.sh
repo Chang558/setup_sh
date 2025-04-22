@@ -115,7 +115,10 @@ cat <<'EOT' > /home/$USERNAME/scripts/install_nvidia_jetpack.sh
 echo "$(date): NVIDIA JetPack 설치 시작"
 sudo apt-get install -y nvidia-jetpack
 echo "$(date): NVIDIA JetPack 설치 완료"
+
+echo "5초후 재부팅 됩니다..."
 sudo rm -rf /home/$USER/.config/autostart/nvidia_install.desktop
+sleep 5 && sudo reboot
 EOT
 
 chmod +x /home/$USERNAME/scripts/install_nvidia_jetpack.sh
